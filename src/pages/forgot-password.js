@@ -9,6 +9,8 @@ import Label from '@/components/Label'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import { useState } from 'react'
+import { Form, Formik } from 'formik'
+import * as Yup from 'yup'
 
 const ForgotPassword = () => {
     const { forgotPassword } = useAuth({ middleware: 'guest' })
@@ -17,10 +19,9 @@ const ForgotPassword = () => {
     const [errors, setErrors] = useState([])
     const [status, setStatus] = useState(null)
 
-    const submitForm = event => {
-        event.preventDefault()
+    const submitForm = values => {
 
-        forgotPassword({ email, setErrors, setStatus })
+        forgotPassword({ ...values, setErrors, setStatus })
     }
 
     return (
@@ -32,36 +33,24 @@ const ForgotPassword = () => {
                     </Link>
                 }>
                 <div className="mb-4 text-sm text-gray-600">
-                    Forgot your password? No problem. Just let us know your
-                    email address and we will email you a password reset link
-                    that will allow you to choose a new one.
+                    Lupa password? tidak masalah. beritahu kepada kami email anda dan kami akan mengirimkan email untuk membuat password baru anda.
                 </div>
 
-                {/* Session Status */}
                 <AuthSessionStatus className="mb-4" status={status} />
+                <Formik initialValues={{
+                    email: ''
+                }} validationSchema={Yup.object({
+                    email: Yup.string().required('Email wajib diisi')
+                })} onSubmit={(values) => {
+                    submitForm(values)
+                }}>
+                    <Form>
+                        <Input required messages={errors.email} label='Email' name='email' type='email' autoFocus />
+                        <Button className={'mt-4'} width='w-full'>Kirim email untuk mengganti password</Button>
+                    </Form>
+                </Formik>
 
-                <form onSubmit={submitForm}>
-                    {/* Email Address */}
-                    <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                            id="email"
-                            type="email"
-                            name="email"
-                            value={email}
-                            className="block mt-1 w-full"
-                            onChange={event => setEmail(event.target.value)}
-                            required
-                            autoFocus
-                        />
 
-                        <InputError messages={errors.email} className="mt-2" />
-                    </div>
-
-                    <div className="flex items-center justify-end mt-4">
-                        <Button>Email Password Reset Link</Button>
-                    </div>
-                </form>
             </AuthCard>
         </GuestLayout>
     )

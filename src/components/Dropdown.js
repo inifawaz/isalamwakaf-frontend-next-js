@@ -7,6 +7,7 @@ const Dropdown = ({
     contentClasses = 'py-1 bg-white',
     trigger,
     children,
+    z = 'z-10'
 }) => {
     let alignmentClasses
 
@@ -32,7 +33,7 @@ const Dropdown = ({
     const [open, setOpen] = useState(false)
 
     return (
-        <Menu as="div" className="relative">
+        <Menu as="div" className={`relative ${z}`}>
             {({ open }) => (
                 <>
                     <Menu.Button as={React.Fragment}>{trigger}</Menu.Button>

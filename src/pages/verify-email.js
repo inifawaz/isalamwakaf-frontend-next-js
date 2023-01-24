@@ -24,23 +24,20 @@ const VerifyEmail = () => {
                 }>
 
                 <div className="mb-4 text-sm text-gray-600">
-                    Thanks for signing up! Before getting started, could you
-                    verify your email address by clicking on the link we just
-                    emailed to you? If you didn't receive the email, we will
-                    gladly send you another.
+                    Terimakasih telah mendaftar! Sebelum memulai, silahkan lakukan verifikasi email dengan mengklik verifikasi pada email yang baru saja kami kirimkan ke anda.
                 </div>
 
                 {status === 'verification-link-sent' && (
                     <div className="mb-4 font-medium text-sm text-green-600">
-                        A new verification link has been sent to the email
-                        address you provided during registration.
+                        Email verifikasi telah kami kirimkan ke email yang anda daftarkan ketika membuat akun
                     </div>
                 )}
 
                 <div className="mt-4 flex items-center justify-between">
                     <Button
+                        width='w-fitt'
                         onClick={() => resendEmailVerification({ setStatus })}>
-                        Resend Verification Email
+                        Kirim ulang email verifikasi
                     </Button>
 
                     <button

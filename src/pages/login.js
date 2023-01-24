@@ -4,12 +4,13 @@ import AuthSessionStatus from '@/components/AuthSessionStatus'
 import Button from '@/components/Button'
 import GuestLayout from '@/components/Layouts/GuestLayout'
 import Input from '@/components/Input'
-import InputError from '@/components/InputError'
-import Label from '@/components/Label'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { Form, Formik } from 'formik'
+import * as Yup from 'yup'
+import Checkbox from '@/components/Checkbox'
 
 const Login = () => {
     const router = useRouter()
@@ -19,11 +20,11 @@ const Login = () => {
         redirectIfAuthenticated: '/dashboard',
     })
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [shouldRemember, setShouldRemember] = useState(false)
+
+
     const [errors, setErrors] = useState([])
     const [status, setStatus] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
         if (router.query.reset?.length > 0 && errors.length === 0) {
@@ -33,15 +34,13 @@ const Login = () => {
         }
     })
 
-    const submitForm = async event => {
-        event.preventDefault()
+    const handleLogin = async (values) => {
 
         login({
-            email,
-            password,
-            remember: shouldRemember,
+            ...values,
             setErrors,
             setStatus,
+            setIsLoading
         })
     }
 
@@ -55,78 +54,37 @@ const Login = () => {
                 }>
                 {/* Session Status */}
                 <AuthSessionStatus className="mb-4" status={status} />
+                <Formik initialValues={{
+                    email: '',
+                    password: '',
+                    remember: false
+                }} validationSchema={Yup.object({
+                    email: Yup.string().required('Email wajib diisi')
+                })} onSubmit={(values) => {
+                    handleLogin(values)
+                }}>
+                    <Form>
+                        <Input required messages={errors.email} label='Email' name="email" type='email' />
+                        <Input required messages={errors.password} label='Password' name="password" type='password' />
+                        <div className='flex justify-between items-center'>
+                            <Checkbox name='remember'>Ingat saya</Checkbox>
+                            <Link
+                                href="/forgot-password"
+                                className=" text-sm text-gray-600 hover:text-gray-900">
+                                Lupa password?
+                            </Link>
+                        </div>
+                        <Button isLoading={isLoading} className={'mt-4'} width='w-full'>
+                            Login
+                        </Button>
+                    </Form>
 
-                <form onSubmit={submitForm}>
-                    {/* Email Address */}
-                    <div>
-                        <Label htmlFor="email">Email</Label>
-
-                        <Input
-                            id="email"
-                            type="email"
-                            value={email}
-                            className="block mt-1 w-full"
-                            onChange={event => setEmail(event.target.value)}
-                            required
-                            autoFocus
-                        />
-
-                        <InputError messages={errors.email} className="mt-2" />
-                    </div>
-
-                    {/* Password */}
-                    <div className="mt-4">
-                        <Label htmlFor="password">Password</Label>
-
-                        <Input
-                            id="password"
-                            type="password"
-                            value={password}
-                            className="block mt-1 w-full"
-                            onChange={event => setPassword(event.target.value)}
-                            required
-                            autoComplete="current-password"
-                        />
-
-                        <InputError
-                            messages={errors.password}
-                            className="mt-2"
-                        />
-                    </div>
-
-                    {/* Remember Me */}
-                    <div className="block mt-4">
-                        <label
-                            htmlFor="remember_me"
-                            className="inline-flex items-center">
-                            <input
-                                id="remember_me"
-                                type="checkbox"
-                                name="remember"
-                                className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                onChange={event =>
-                                    setShouldRemember(event.target.checked)
-                                }
-                            />
-
-                            <span className="ml-2 text-sm text-gray-600">
-                                Remember me
-                            </span>
-                        </label>
-                    </div>
-
-                    <div className="flex items-center justify-end mt-4">
-                        <Link
-                            href="/forgot-password"
-                            className="underline text-sm text-gray-600 hover:text-gray-900">
-                            Forgot your password?
-                        </Link>
-
-                        <Button className="ml-3">Login</Button>
-                    </div>
-                </form>
+                </Formik>
+                <div className='flex items-center justify-center'>
+                    <Link className='text-sm text-dark-400 font-semibold mt-4' href='/register'>Belum punya akun? <span className='text-brand-600'>Daftar sekarang</span></Link>
+                </div>
             </AuthCard>
-        </GuestLayout>
+        </GuestLayout >
     )
 }
 

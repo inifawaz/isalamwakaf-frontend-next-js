@@ -5,70 +5,115 @@ import NavLink from '@/components/NavLink'
 import ResponsiveNavLink, {
     ResponsiveNavButton,
 } from '@/components/ResponsiveNavLink'
-import { DropdownButton } from '@/components/DropdownLink'
+import DropdownLink, { DropdownButton } from '@/components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { adminMenu, publicMenu, userMenu } from '@/variables/menu'
+import Container from '../Container'
+import Button from '../Button'
+import { data } from 'autoprefixer'
+import { BiBell } from 'react-icons/bi'
+import { HiBell } from 'react-icons/hi2'
 
-const Navigation = ({ user }) => {
+const Navigation = () => {
+    const { user } = useAuth()
     const router = useRouter()
 
-    const { logout } = useAuth()
+    const { logout, isAdmin } = useAuth()
 
     const [open, setOpen] = useState(false)
 
     return (
-        <nav className="bg-white border-b border-gray-100">
+        <nav className="bg-white border-b shadow border-gray-100">
             {/* Primary Navigation Menu */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Container >
                 <div className="flex justify-between h-16">
-                    <div className="flex">
+                    <div className="flex grow justify-between">
                         {/* Logo */}
                         <div className="flex-shrink-0 flex items-center">
-                            <Link href="/dashboard">
+                            <Link href="/">
                                 <ApplicationLogo className="block h-10 w-auto fill-current text-gray-600" />
                             </Link>
                         </div>
+                        {user?.payment_waiting > 0 && (
+                            <Link href={'/admin/manual-payments'} className='flex items-center'>
+                                <HiBell className='text-brand-500 h-6 w-6' />
+                                <span className='text-sm text-dark-400 ml-1'>{user?.payment_waiting}</span>
+                            </Link>
+                        )}
+                        {user?.payment_pending > 0 && (
+                            <Link href={'/user/manual-payments'} className='flex items-center'>
+                                <HiBell className='text-brand-500 h-6 w-6' />
+                                <span className='text-sm text-dark-400 ml-1'>{user?.payment_pending}</span>
+                            </Link>
+                        )}
 
                         {/* Navigation Links */}
-                        <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <NavLink
-                                href="/dashboard"
-                                active={router.pathname === '/dashboard'}>
-                                Dashboard
-                            </NavLink>
+                        <div className="hidden space-x-8 sm:-my-px sm:ml-10  sm:flex ">
+
+                            {publicMenu.map((item, index) => (
+                                <NavLink
+                                    key={index}
+                                    href={item.href}
+                                    active={router.pathname === item.href}>
+                                    {item.name}
+                                </NavLink>
+                            ))}
+
+                            {!user && (
+                                <div className='flex items-center space-x-2'>
+                                    <Link href={'/register'}>
+                                        <Button className='btn-brand-light'>Daftar</Button>
+                                    </Link>
+                                    <Link href={'/login'}>
+                                        <Button>Login</Button>
+
+                                    </Link>
+                                </div>
+                            )}
+
                         </div>
                     </div>
 
                     {/* Settings Dropdown */}
-                    <div className="hidden sm:flex sm:items-center sm:ml-6">
-                        <Dropdown
-                            align="right"
-                            width="48"
-                            trigger={
-                                <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
-                                    <div>{user?.name}</div>
+                    {user && (
+                        <div className="hidden sm:flex sm:items-center sm:ml-6">
+                            <Dropdown
+                                align="right"
+                                width="48"
+                                trigger={
+                                    <button className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 focus:outline-none transition duration-150 ease-in-out">
+                                        <div>{user?.name}</div>
 
-                                    <div className="ml-1">
-                                        <svg
-                                            className="fill-current h-4 w-4"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 20 20">
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                    </div>
-                                </button>
-                            }>
-                            {/* Authentication */}
-                            <DropdownButton onClick={logout}>
-                                Logout
-                            </DropdownButton>
-                        </Dropdown>
-                    </div>
+                                        <div className="ml-1">
+                                            <svg
+                                                className="fill-current h-4 w-4"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 20 20">
+                                                <path
+                                                    fillRule="evenodd"
+                                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                    clipRule="evenodd"
+                                                />
+                                            </svg>
+                                        </div>
+                                    </button>
+                                }>
+                                {/* Authentication */}
+                                {isAdmin && adminMenu.map((item, index) => (
+                                    <DropdownLink key={index} href={item.href}>{item.name}</DropdownLink>
+                                ))}
+                                {!isAdmin && userMenu.map((item, index) => (
+                                    <DropdownLink key={index} href={item.href}>{item.name}</DropdownLink>
+                                ))}
+                                <DropdownButton onClick={logout}>
+                                    Logout
+                                </DropdownButton>
+                            </Dropdown>
+                        </div>
+                    )}
+
 
                     {/* Hamburger */}
                     <div className="-mr-2 flex items-center sm:hidden">
@@ -101,17 +146,21 @@ const Navigation = ({ user }) => {
                         </button>
                     </div>
                 </div>
-            </div>
+            </Container>
 
             {/* Responsive Navigation Menu */}
             {open && (
                 <div className="block sm:hidden">
                     <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink
-                            href="/dashboard"
-                            active={router.pathname === '/dashboard'}>
-                            Dashboard
-                        </ResponsiveNavLink>
+                        {publicMenu.map((item, index) => (
+                            <ResponsiveNavLink
+                                key={index}
+                                href={item.href}
+                                active={router.pathname === item.href}>
+                                {item.name}
+                            </ResponsiveNavLink>
+                        ))}
+
                     </div>
 
                     {/* Responsive Settings Options */}
@@ -145,6 +194,12 @@ const Navigation = ({ user }) => {
 
                         <div className="mt-3 space-y-1">
                             {/* Authentication */}
+                            {isAdmin && adminMenu.map((item, index) => (
+                                <ResponsiveNavLink key={index} href={item.href} active={router.pathname == item.href}>{item.name}</ResponsiveNavLink>
+                            ))}
+                            {!isAdmin && userMenu.map((item, index) => (
+                                <ResponsiveNavLink key={index} href={item.href} active={router.pathname == item.href}>{item.name}</ResponsiveNavLink>
+                            ))}
                             <ResponsiveNavButton onClick={logout}>
                                 Logout
                             </ResponsiveNavButton>
