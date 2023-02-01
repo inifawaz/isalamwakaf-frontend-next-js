@@ -17,6 +17,7 @@ module.exports = {
             jsx: true,
         },
         ecmaVersion: 2020,
+        requireConfigFile: false
     },
     plugins: ['react', '@next/eslint-plugin-next', 'prettier'],
     rules: {
@@ -39,5 +40,6 @@ module.exports = {
         'linebreak-style': ['error', 'unix'],
         semi: ['error', 'never'],
         'prettier/prettier': ['error', { "endOfLine": "off" }, { usePrettierrc: true }],
+
     },
 };
