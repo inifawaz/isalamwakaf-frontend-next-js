@@ -3,6 +3,18 @@ import { useField } from "formik";
 const Input = ({ type = 'text', label, required, labelRequired, className, width = 'w-full', messages = [], ...props }) => {
 
     const [field, meta] = useField(props);
+    const numberInputOnWheelPreventChange = (e) => {
+        // Prevent the input value change
+        e.target.blur();
+
+        // Prevent the page/container scrolling
+        e.stopPropagation();
+
+        // Refocus immediately, on the next tick (after the current function is done)
+        setTimeout(() => {
+            e.target.focus();
+        }, 0);
+    };
     return (
         <div className="mb-4">
             {label && (
@@ -12,7 +24,7 @@ const Input = ({ type = 'text', label, required, labelRequired, className, width
                 })} htmlFor={props.name || props.id}>{label}</label>
             )}
 
-            <input type={type} className={clsx(width, className, {
+            <input onWheel={numberInputOnWheelPreventChange} type={type} className={clsx(width, className, {
                 'rounded-md  shadow-sm border-gray-300 disabled:bg-dark-200 placeholder:text-dark-300  focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50': true,
                 width: width,
                 className: className
@@ -34,4 +46,4 @@ const Input = ({ type = 'text', label, required, labelRequired, className, width
         </div>
     );
 };
-export default Input
+export default Input;

@@ -1,9 +1,9 @@
-import Link from 'next/link'
-import React from 'react'
-import Card from './Card'
-import Thumbnail from './Thumbnail'
-import { BiPurchaseTag, BiTimer, BiBullseye, BiGroup } from 'react-icons/bi'
-import formatToCurreny from '@/functions/formatToCurreny'
+import Link from 'next/link';
+import React from 'react';
+import Card from './Card';
+import Thumbnail from './Thumbnail';
+import { BiPurchaseTag, BiTimer, BiBullseye, BiGroup } from 'react-icons/bi';
+import formatToCurreny from '@/functions/formatToCurreny';
 
 const CampaignItem = ({ data, forAdmin }) => {
     return (
@@ -53,7 +53,7 @@ const CampaignItem = ({ data, forAdmin }) => {
                         {data.is_target ? (
                             <div className=' mr-2 mt-1  flex items-center space-x-1'>
                                 <BiBullseye className='h-4 w-4 text-brand-600' />
-                                <p className='text-dark-400 text-xs font-semibold'>Target Rp 807.000.000,00</p>
+                                <p className='text-dark-400 text-xs font-semibold'>{formatToCurreny(data.target_amount)}</p>
                             </div>
                         ) : (
                             <div className=' mr-2 mt-1  flex items-center space-x-1'>
@@ -77,7 +77,7 @@ const CampaignItem = ({ data, forAdmin }) => {
             </Card>
         </Link>
 
-    )
-}
+    );
+};
 
-export default CampaignItem
+export default CampaignItem;

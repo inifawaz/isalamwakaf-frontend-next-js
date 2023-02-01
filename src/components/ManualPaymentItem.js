@@ -1,88 +1,89 @@
-import formatToCurreny from '@/functions/formatToCurreny'
-import { useAuth } from '@/hooks/auth'
-import axios from '@/lib/axios'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { HiPhoto } from 'react-icons/hi2'
-import Button from './Button'
-import Card from './Card'
-import Modal from './Modal'
+import formatToCurreny from '@/functions/formatToCurreny';
+import { useAuth } from '@/hooks/auth';
+import axios from '@/lib/axios';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { HiPhoto } from 'react-icons/hi2';
+import Button from './Button';
+import Card from './Card';
+import Modal from './Modal';
 
 const ManualPaymentItem = ({ item, mutate }) => {
-    const { userMutate } = useAuth()
-    const [openHelp, setOpenHelp] = useState(false)
-    const { isAdmin } = useAuth()
-    const [data, setData] = useState(item)
-    const [open, setOpen] = useState(false)
-    const [statusCode, setStatusCode] = useState(data.status_code ?? '')
-    const [comment, setComment] = useState(data.comment ?? '')
-    const [isLoading, setIsLoading] = useState(false)
-    const [receiptUrl, setReceiptUrl] = useState(data.receipt_url)
-    const [receiptFile, setReceiptFile] = useState(null)
+    const { userMutate } = useAuth();
+    const [openHelp, setOpenHelp] = useState(false);
+    const { isAdmin } = useAuth();
+    const [data, setData] = useState(item);
+    const [open, setOpen] = useState(false);
+    const [statusCode, setStatusCode] = useState(data.status_code ?? '');
+    const [comment, setComment] = useState(data.comment ?? '');
+    const [isLoading, setIsLoading] = useState(false);
+    const [receiptUrl, setReceiptUrl] = useState(data.receipt_url);
+    const [receiptFile, setReceiptFile] = useState(null);
     const convertDate = (value) => {
-        const date = new Date(value?.toString())
-        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate()
-        const month = date.getMonth() + 1
-        const year = date.getFullYear()
-        const hour = date.getHours()
-        const minute = date.getMinutes()
-        return (day + '/' + (month < 10 ? "0" + month : month) + '/' + year + ' ' + (hour < 10 ? "0" + hour : hour) + ':' + (minute < 10 ? "0" + minute : minute))
-    }
+        const date = new Date(value?.toString());
+        const day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const hour = date.getHours();
+        const minute = date.getMinutes();
+        return (day + '/' + (month < 10 ? "0" + month : month) + '/' + year + ' ' + (hour < 10 ? "0" + hour : hour) + ':' + (minute < 10 ? "0" + minute : minute));
+    };
     const uploadReceipt = async () => {
         if (receiptFile == null) {
-            toast.error('Bukti pembayaran tidak boleh kosong')
-            return
+            toast.error('Bukti pembayaran tidak boleh kosong');
+            return;
         }
-        setIsLoading(true)
-        const formData = new FormData()
-        formData.append('reference', data.reference)
-        formData.append('receipt_file', receiptFile)
-        formData.append('_method', 'PUT')
+        setIsLoading(true);
+        const formData = new FormData();
+        formData.append('reference', data.reference);
+        formData.append('receipt_file', receiptFile);
+        formData.append('_method', 'PUT');
         await axios.post(`/api/manual-payments/upload-receipt`, formData).then(res => {
-            toast.success(res.data.message)
+            toast.success(res.data.message);
         }).catch(err => {
-            console.log(err)
-            toast.error('Sedang terjadi kesalahan')
-            userMutate()
+            console.log(err);
+            toast.error('Sedang terjadi kesalahan');
+            userMutate();
 
-            mutate()
+            mutate();
         }).finally(() => {
-            setOpen(false)
-            setIsLoading(false)
-            userMutate()
+            setOpen(false);
+            setIsLoading(false);
+            userMutate();
 
-            mutate()
-        })
-    }
+            mutate();
+        });
+    };
     const updateStatus = async () => {
-        setIsLoading(true)
+        console.log(statusCode);
+        setIsLoading(true);
         await axios.put('/api/manual-payments/update-status', {
             reference: data.reference,
             status_code: statusCode,
             comment: comment
         }).then(res => {
-            toast.success(res.data.message)
-            userMutate()
-            mutate()
+            toast.success(res.data.message);
+            userMutate();
+            mutate();
         }).finally(() => {
-            mutate()
-            userMutate()
-            setOpen(false)
-            setIsLoading(false)
-        })
-    }
+            mutate();
+            userMutate();
+            setOpen(false);
+            setIsLoading(false);
+        });
+    };
     useEffect(() => {
-        setData(item)
-        setStatusCode(item.status_code)
-        setComment(item.comment)
-        setReceiptUrl(item.receipt_url)
+        setData(item);
+        setStatusCode(item.status_code);
+        setComment(item.comment);
+        setReceiptUrl(item.receipt_url);
 
-    }, [item])
+    }, [item]);
     return (
         <>
             <Modal open={open} setOpen={setOpen} onClose={() => {
-                setOpen(false)
+                setOpen(false);
             }}>
                 <Modal.Title>Bukti Pembayaran</Modal.Title>
                 <Modal.Body>
@@ -93,14 +94,14 @@ const ManualPaymentItem = ({ item, mutate }) => {
                     {statusCode == 0 && (
                         <>
                             <input value={''} id='featured_image' className='hidden' onChange={(e) => {
-                                let pic = URL.createObjectURL(e.target.files[0])
-                                setReceiptUrl(pic)
-                                setReceiptFile(e.target.files[0])
+                                let pic = URL.createObjectURL(e.target.files[0]);
+                                setReceiptUrl(pic);
+                                setReceiptFile(e.target.files[0]);
                             }} type='file' accept='image/*' />
                             <label className='btn-brand-light mr-4 cursor-pointer' htmlFor="featured_image">{receiptUrl ? 'Ganti Foto' : 'Upload Foto'}</label>
                             <Button onClick={() => {
-                                setReceiptUrl(null)
-                                setReceiptFile(null)
+                                setReceiptUrl(null);
+                                setReceiptFile(null);
                             }} width='w-fit' btn='btn-danger-light'>Hapus Foto</Button>
                         </>
                     )}
@@ -154,7 +155,7 @@ const ManualPaymentItem = ({ item, mutate }) => {
                 </Modal.Footer>
             </Modal>
             <Modal open={openHelp} onClose={() => {
-                setOpenHelp(false)
+                setOpenHelp(false);
             }}>
                 <Modal.Title>Cara Pembayaran</Modal.Title>
                 <Modal.Body>
@@ -220,7 +221,7 @@ const ManualPaymentItem = ({ item, mutate }) => {
                 )}
             </Card >
         </>
-    )
-}
+    );
+};
 
-export default ManualPaymentItem
+export default ManualPaymentItem;

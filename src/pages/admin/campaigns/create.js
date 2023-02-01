@@ -1,75 +1,75 @@
-import Button from '@/components/Button'
-import Card from '@/components/Card'
-import Checkbox from '@/components/Checkbox'
-import Input from '@/components/Input'
-import AppLayout from '@/components/Layouts/AppLayout'
-import DashboardAdminLayout from '@/components/Layouts/DashboardAdminLayout'
-import Modal from '@/components/Modal'
-import PageLoader from '@/components/PageLoader'
-import Select from '@/components/Select'
-import axios from '@/lib/axios'
-import clsx from 'clsx'
-import { Form, Formik } from 'formik'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import React, { useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { HiPhoto } from 'react-icons/hi2'
-import useSWR from 'swr'
-import * as Yup from 'yup'
+import Button from '@/components/Button';
+import Card from '@/components/Card';
+import Checkbox from '@/components/Checkbox';
+import Input from '@/components/Input';
+import AppLayout from '@/components/Layouts/AppLayout';
+import DashboardAdminLayout from '@/components/Layouts/DashboardAdminLayout';
+import Modal from '@/components/Modal';
+import PageLoader from '@/components/PageLoader';
+import Select from '@/components/Select';
+import axios from '@/lib/axios';
+import clsx from 'clsx';
+import { Form, Formik } from 'formik';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
+import { HiPhoto } from 'react-icons/hi2';
+import useSWR from 'swr';
+import * as Yup from 'yup';
 const Editor = dynamic(() => import("@/components/Editor"), {
     ssr: false,
 });
 
 const Create = () => {
-    const [errors, setErrors] = useState([])
-    const [isLoading, setIsLoading] = useState(false)
-    const [content, setContent] = useState('')
-    const [featuredImageUrl, setFeaturedImageUrl] = useState('')
-    const [featuredImageFile, setFeaturedImageFile] = useState(null)
-    const router = useRouter()
-    const { id } = router.query
+    const [errors, setErrors] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [content, setContent] = useState('');
+    const [featuredImageUrl, setFeaturedImageUrl] = useState('');
+    const [featuredImageFile, setFeaturedImageFile] = useState(null);
+    const router = useRouter();
+    const { id } = router.query;
 
 
     const { data: campaignCategories } = useSWR(`/api/campaign-categories`, () => axios.get(`/api/campaign-categories`).then((res) => {
-        console.log(res.data.data)
-        return res.data.data
-    }))
+        console.log(res.data.data);
+        return res.data.data;
+    }));
 
 
 
     const handleStore = async (values) => {
 
-        setIsLoading(true)
+        setIsLoading(true);
         const choice_amount = [values.choice_amount_1, values.choice_amount_2, values.choice_amount_3, values.choice_amount_4].filter(e => !Number.isNaN(e) && e !== null && e > 0).map((e) => parseInt(e));
-        const formData = new FormData()
-        formData.append('title', values.title)
-        formData.append('category_id', values.category_id)
-        formData.append('choice_amount', JSON.stringify(choice_amount))
-        formData.append('maintenance_fee', values.maintenance_fee)
-        formData.append('is_target', values.is_target ? 1 : 0)
-        formData.append('target_amount', values.target_amount)
-        formData.append('is_limited_time', values.is_limited_time ? 1 : 0)
+        const formData = new FormData();
+        formData.append('title', values.title);
+        formData.append('category_id', values.category_id);
+        formData.append('choice_amount', JSON.stringify(choice_amount));
+        formData.append('maintenance_fee', values.maintenance_fee);
+        formData.append('is_target', values.is_target ? 1 : 0);
+        formData.append('target_amount', values.target_amount);
+        formData.append('is_limited_time', values.is_limited_time ? 1 : 0);
         formData.append('start_date', values.start_date);
         formData.append('end_date', values.end_date);
-        formData.append('is_hidden', values.is_hidden ? 1 : 0)
-        formData.append('is_selected', values.is_selected ? 1 : 0)
-        formData.append('is_completed', values.is_completed ? 1 : 0)
-        formData.append('featured_image_url', featuredImageUrl)
-        formData.append('featured_image_file', featuredImageFile)
-        formData.append('content', content)
+        formData.append('is_hidden', values.is_hidden ? 1 : 0);
+        formData.append('is_selected', values.is_selected ? 1 : 0);
+        formData.append('is_completed', values.is_completed ? 1 : 0);
+        formData.append('featured_image_url', featuredImageUrl);
+        formData.append('featured_image_file', featuredImageFile);
+        formData.append('content', content);
         await axios.post(`/api/campaigns`, formData).then(res => {
-            toast.success(res.data.message)
-            console.log(res)
-            setIsLoading(false)
-            router.push('/admin/campaigns')
+            toast.success(res.data.message);
+            console.log(res);
+            setIsLoading(false);
+            router.push('/admin/campaigns');
 
         }).catch((err) => {
-            console.log(err)
-            setIsLoading(false)
-            toast.error('Sedang terjadi kesalahan')
-        })
-    }
+            console.log(err);
+            setIsLoading(false);
+            toast.error('Sedang terjadi kesalahan');
+        });
+    };
 
 
     return (
@@ -85,9 +85,9 @@ const Create = () => {
                     <div className='p-6 bg-white'>
                         <div className='mb-4'>
                             <input value={''} id='featured_image' className='hidden' onChange={(e) => {
-                                let pic = URL.createObjectURL(e.target.files[0])
-                                setFeaturedImageUrl(pic)
-                                setFeaturedImageFile(e.target.files[0])
+                                let pic = URL.createObjectURL(e.target.files[0]);
+                                setFeaturedImageUrl(pic);
+                                setFeaturedImageFile(e.target.files[0]);
                             }} type='file' accept='image/*' />
                             <label className='btn-brand-light mr-4 cursor-pointer' htmlFor="featured_image">{featuredImageUrl ? 'Ganti Foto' : 'Upload Foto'}</label>
                             <Button onClick={() => setFeaturedImageUrl(null)} width='w-fit' btn='btn-danger-light'>Hapus Foto</Button>
@@ -96,12 +96,12 @@ const Create = () => {
                             title: '',
                             category_id: '',
 
-                            choice_amount_1: '',
-                            choice_amount_2: '',
-                            choice_amount_3: '',
-                            choice_amount_4: '',
+                            choice_amount_1: 50000,
+                            choice_amount_2: 100000,
+                            choice_amount_3: 150000,
+                            choice_amount_4: 200000,
 
-                            maintenance_fee: '',
+                            maintenance_fee: 2000,
 
                             is_target: false,
                             target_amount: '',
@@ -153,7 +153,7 @@ const Create = () => {
                                 <div className='mb-4'>
                                     <label className='block font-medium text-sm mb-1 text-gray-700' htmlFor="">Content</label>
                                     <Editor data={content} onChange={(data) => {
-                                        setContent(data)
+                                        setContent(data);
                                     }} />
                                 </div>
                                 <Checkbox name='is_hidden'>Sembunyikan Program Wakaf</Checkbox>
@@ -167,14 +167,14 @@ const Create = () => {
                 </Card>
             </div >
         </>
-    )
-}
+    );
+};
 
-export default Create
+export default Create;
 Create.getLayout = function getLayout(page) {
     return <AppLayout>
         <DashboardAdminLayout>
             {page}
         </DashboardAdminLayout>
-    </AppLayout>
-}
+    </AppLayout>;
+};
