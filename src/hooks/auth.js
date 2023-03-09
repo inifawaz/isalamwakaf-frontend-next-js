@@ -36,7 +36,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated } = {}) => {
 
                 setErrors(error.response.data.errors);
             }).finally(() => {
-                setIsLoading(false);
+                // setIsLoading(false);
             });
     };
 
